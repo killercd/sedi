@@ -28,22 +28,23 @@ if __name__ == '__main__':
     port_list = args.ports
     host_list = args.hosts
     
+    
     if(len(host_list)<=0):
         host_list.append(dest_ip)
     
     for port in port_list:
         for idstring in request_list:
             for host in host_list:
-                idstring = idstring.replace("%HOST%",host)
+                rep_idstring = idstring.replace("%HOST%",host)
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 print(f"--> {dest_ip}:{port}")
-                print(f"{ESC_ANSI}{FONT_GREEN}{idstring}{STYLE_RESET}")
+                print(f"{ESC_ANSI}{FONT_GREEN}{rep_idstring}{STYLE_RESET}")
                 try:
                     s.settimeout(SOCKET_TIME)
                     s.connect((dest_ip, port))
-                    s.send(idstring.encode())
+                    s.send(rep_idstring.encode())
                     print(f"<-- {dest_ip}:{port}")
-                    retdata = s.recv(5000).decode("utf-8")[:1000]
+                    retdata = s.recv(5000).decode("utf-8",errors="replace")[:1000]
                     print(f"{ESC_ANSI}{FONT_BLUE}{retdata}{STYLE_RESET}")
                     s.close()
                 except ConnectionRefusedError:
@@ -51,4 +52,5 @@ if __name__ == '__main__':
                 except TimeoutError:
                     print("Connection timeout")
                 except OSError as ex:
-                    print("Connection error: ",e) 
+                    print("Connection error: ",ex) 
+
